@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Admin Panel</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div id="portalHeader"></div>
+    
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2 style="padding: 1.5rem; font-size: 1.25rem; font-weight: 700; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">Admin Panel</h2>
+            <nav>
+                <a href="admin-dashboard.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="admin-users.html" class="sidebar-link active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Manage Users</span>
+                </a>
+                <a href="admin-profile.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Profile</span>
+                </a>
+                <a href="admin-settings.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                        <path d="M17 7l-5 5"></path>
+                        <path d="M7 7l5 5"></path>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding: 0.75rem;">
+                <button onclick="auth.logout()" class="btn btn-outline btn-full" style="color: #ef4444; border-color: #ef4444;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2rem; font-weight: 700;">Manage Users</h1>
+                <button onclick="showAddUserModal()" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add User
+                </button>
+            </div>
+
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 1rem; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: rgba(243, 244, 246, 0.5);">
+                            <tr>
+                                <th style="padding: 1rem; text-align: left; font-weight: 500;">Name</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 500;">Email</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 500;">Role</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 500;">Status</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 500;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/portal-header.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        auth.requireRole('admin');
+
+        // Initialize portal header
+        document.getElementById('portalHeader').innerHTML = renderPortalHeader('Admin Panel', false);
+
+        const users = [
+            { id: 1, name: 'John Customer', email: 'customer@test.com', role: 'customer', status: 'active' },
+            { id: 2, name: 'Jane Seller', email: 'seller@test.com', role: 'seller', status: 'active' },
+            { id: 3, name: 'Admin User', email: 'admin@test.com', role: 'admin', status: 'active' },
+            { id: 4, name: 'Alice Smith', email: 'alice@example.com', role: 'customer', status: 'active' },
+            { id: 5, name: 'Bob Johnson', email: 'bob@example.com', role: 'seller', status: 'inactive' }
+        ];
+
+        function getRoleBadge(role) {
+            const colors = {
+                'customer': 'background: #dbeafe; color: #1e40af;',
+                'seller': 'background: #fef3c7; color: #92400e;',
+                'admin': 'background: #fee2e2; color: #991b1b;'
+            };
+            return `<span style="${colors[role]} padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; text-transform: capitalize;">${role}</span>`;
+        }
+
+        function getStatusBadge(status) {
+            const colors = {
+                'active': 'background: #dcfce7; color: #166534;',
+                'inactive': 'background: #fee2e2; color: #991b1b;'
+            };
+            return `<span style="${colors[status]} padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; text-transform: capitalize;">${status}</span>`;
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = users.map(user => `
+                <tr style="border-top: 1px solid var(--border);">
+                    <td style="padding: 1rem; font-weight: 500;">${user.name}</td>
+                    <td style="padding: 1rem; color: var(--text-muted);">${user.email}</td>
+                    <td style="padding: 1rem;">${getRoleBadge(user.role)}</td>
+                    <td style="padding: 1rem;">${getStatusBadge(user.status)}</td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="editUser(${user.id})" class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Edit</button>
+                            <button onclick="toggleUserStatus(${user.id})" class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">${user.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddUserModal() {
+            showToast('Add user functionality coming soon', 'success');
+        }
+
+        function editUser(id) {
+            showToast('Edit user functionality coming soon', 'success');
+        }
+
+        function toggleUserStatus(id) {
+            const user = users.find(u => u.id === id);
+            if (user) {
+                user.status = user.status === 'active' ? 'inactive' : 'active';
+                renderUsers();
+                showToast(`User ${user.status === 'active' ? 'activated' : 'deactivated'} successfully`, 'success');
+            }
+        }
+
+        renderUsers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Fabrice-E-Shopping</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Fabrice-E-Shopping
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" class="nav-link">Home</a>
+            </div>
+
+            <div class="nav-actions" id="navActions">
+                <a href="login.html" class="btn btn-primary">Login</a>
+                <a href="register.html" class="btn btn-outline">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container products-section">
+        <h1 class="section-title">Browse Products</h1>
+        
+        <div class="form-group">
+            <input type="text" class="form-input" id="searchInput" placeholder="Search products...">
+        </div>
+
+        <div id="productsGrid" class="products-grid"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Fabrice-E-Shopping. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/data.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        function renderProducts(productsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            
+            grid.innerHTML = productsToRender.map(product => `
+                <div class="product-card" onclick="viewProduct(${product.id})">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-category">${product.category}</div>
+                        <h3 class="product-name">${product.name}</h3>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0;">
+                            <span>${renderStars(Math.floor(product.rating))}</span>
+                            <span style="font-size: 0.875rem; color: var(--text-muted);">(${product.reviews})</span>
+                        </div>
+                        <div class="product-price">${formatCurrency(product.price)}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-outline" style="flex: 1; font-size: 0.875rem;" onclick="event.stopPropagation(); addToCart(${product.id})">Add to Cart</button>
+                        <button class="btn btn-primary" style="flex: 1; font-size: 0.875rem;" onclick="event.stopPropagation(); buyNow(${product.id})">Buy Now</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewProduct(id) {
+            window.location.href = `product-detail.html?id=${id}`;
+        }
+
+        function addToCart(id) {
+            if (!auth.isAuthenticated()) {
+                showToast('Please login to add items to cart', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            const product = products.find(p => p.id === id);
+            auth.addToCart(product);
+            showToast('Added to cart!', 'success');
+            updateNavbar();
+        }
+
+        function buyNow(id) {
+            if (!auth.isAuthenticated()) {
+                showToast('Please login to place an order', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            window.location.href = `checkout.html?id=${id}`;
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.category.toLowerCase().includes(searchTerm)
+            );
+            renderProducts(filtered);
+        });
+
+        // Initial render
+        renderProducts();
+    </script>
+</body>
+</html>
