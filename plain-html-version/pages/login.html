@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Fabrice-E-Shopping</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Fabrice-E-Shopping
+            </a>
+        </div>
+    </nav>
+
+    <div class="form-container">
+        <h1 class="form-title">Login</h1>
+        
+        <!-- Test Credentials Info -->
+        <div style="background: #dbeafe; border: 1px solid #3b82f6; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem; color: #1e40af;">Test Credentials:</p>
+            <div style="font-size: 0.875rem; color: #1e40af; line-height: 1.6;">
+                <p><strong>Customer:</strong> customer@test.com / customer123</p>
+                <p><strong>Seller:</strong> seller@test.com / seller123</p>
+                <p><strong>Admin:</strong> admin@test.com / admin123</p>
+            </div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Select Role</label>
+                <select class="form-select" id="role" required>
+                    <option value="">Choose your role...</option>
+                    <option value="customer">Customer</option>
+                    <option value="seller">Seller</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="email" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Login</button>
+        </form>
+        <div class="form-link">
+            Don't have an account? <a href="register.html">Register here</a>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        // Auto-fill credentials when role is selected
+        document.getElementById('role').addEventListener('change', (e) => {
+            const role = e.target.value;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            if (role === 'customer') {
+                emailInput.value = 'customer@test.com';
+                passwordInput.value = 'customer123';
+            } else if (role === 'seller') {
+                emailInput.value = 'seller@test.com';
+                passwordInput.value = 'seller123';
+            } else if (role === 'admin') {
+                emailInput.value = 'admin@test.com';
+                passwordInput.value = 'admin123';
+            } else {
+                emailInput.value = '';
+                passwordInput.value = '';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedRole = document.getElementById('role').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            
+            const result = await auth.login(email, password, selectedRole);
+            
+            if (result.success) {
+                showToast('Login successful!', 'success');
+                
+                // Redirect to backend integrated version
+                setTimeout(() => {
+                    window.location.href = `/backend/${result.user.role}-dashboard.html`;
+                }, 1000);
+            } else {
+                showToast(result.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    </script>
+</body>
+</html>
