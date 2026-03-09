@@ -1,0 +1,48 @@
+databases:
+  # PostgreSQL Database
+  - name: fabrice-ecommerce-db
+    plan: free
+    region: oregon
+    databaseName: fabrice_ecommerce
+    user: fabrice_user
+    ipAllowList: []
+
+services:
+  # Node.js/Express Backend API
+  - type: web
+    name: fabrice-ecommerce-api
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: npm run server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DB_HOST
+        fromDatabase:
+          name: fabrice-ecommerce-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: fabrice-ecommerce-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: fabrice-ecommerce-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: fabrice-ecommerce-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: fabrice-ecommerce-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+    autoDeploy: true

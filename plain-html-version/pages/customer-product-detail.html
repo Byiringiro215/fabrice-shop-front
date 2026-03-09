@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Customer Portal</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div style="min-height: 100vh; display: flex; flex-direction: column; background: rgba(243, 244, 246, 0.3);">
+        <div id="portalHeader"></div>
+
+        <div style="display: flex; flex: 1;">
+            <aside class="sidebar">
+                <h2 style="padding: 1.5rem; font-size: 1.25rem; font-weight: 700; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">Customer Portal</h2>
+                <nav>
+                    <a href="customer-dashboard.html" class="sidebar-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="customer-products.html" class="sidebar-link active">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span>Browse Products</span>
+                    </a>
+                    <a href="customer-orders.html" class="sidebar-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        <span>My Orders</span>
+                    </a>
+                    <a href="customer-reviews.html" class="sidebar-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span>My Reviews</span>
+                    </a>
+                    <a href="customer-profile.html" class="sidebar-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Profile</span>
+                    </a>
+                    <a href="customer-settings.html" class="sidebar-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6"></path>
+                            <path d="M17 7l-5 5"></path>
+                            <path d="M7 7l5 5"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+                <div style="margin-top: auto; padding: 0.75rem;">
+                    <button onclick="auth.logout()" class="btn btn-outline btn-full" style="color: #ef4444; border-color: #ef4444;">Logout</button>
+                </div>
+            </aside>
+
+            <main class="dashboard-content" id="productContent"></main>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/data.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/portal-header.js"></script>
+    <script>
+        auth.requireRole('customer');
+        
+        // Render header
+        document.getElementById('portalHeader').innerHTML = renderPortalHeader('Customer Portal', true);
+
+        // Get product ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+        const product = products.find(p => p.id === productId);
+
+        if (!product) {
+            document.getElementById('productContent').innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Product not found</h1>
+                    <a href="customer-products.html" class="btn btn-primary">Back to Products</a>
+                </div>
+            `;
+        } else {
+            const productReviews = reviews.filter(r => r.productId === productId);
+            
+            document.getElementById('productContent').innerHTML = `
+                <a href="customer-products.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                    ← Back to Products
+                </a>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                    <div style="border-radius: 1rem; overflow: hidden; border: 1px solid var(--border); background: var(--card);">
+                        <img src="${product.image}" alt="${product.name}" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+                    </div>
+
+                    <div>
+                        <span style="font-size: 0.875rem; color: var(--accent); font-weight: 500;">${product.category}</span>
+                        <h1 style="font-size: 1.875rem; font-weight: 700; margin-top: 0.25rem;">${product.name}</h1>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                ${renderStars(Math.floor(product.rating))}
+                                <span style="font-weight: 600;">${product.rating}</span>
+                                <span style="color: var(--text-muted); font-size: 0.875rem;">(${product.reviews} reviews)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--text-muted);">
+                                📍 ${product.location}
+                            </div>
+                        </div>
+                        <p style="font-size: 1.875rem; font-weight: 700; color: var(--accent); margin-top: 1rem;">${product.price}</p>
+                        <p style="color: var(--text-muted); line-height: 1.6; margin-top: 1rem;">${product.description}</p>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-muted); margin-top: 1rem;">
+                            👤 Sold by <span style="font-weight: 500; color: var(--text);">${product.seller}</span>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                            <button onclick="orderNow()" class="btn btn-primary" style="flex: 1;">Order Now</button>
+                            <button onclick="addToCart()" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.5rem;">
+                                🛒 Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Customer Reviews</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                        ${productReviews.length > 0 ? productReviews.map(r => `
+                            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(249, 115, 22, 0.1); display: flex; align-items: center; justify-content: center;">
+                                            👤
+                                        </div>
+                                        <span style="font-weight: 600; font-size: 0.875rem;">${r.user}</span>
+                                    </div>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">${formatDate(r.date)}</span>
+                                </div>
+                                <div style="display: flex; gap: 0.125rem; margin-bottom: 0.5rem;">
+                                    ${Array.from({length: 5}).map((_, i) => 
+                                        `<span style="color: ${i < r.rating ? 'var(--accent)' : '#d1d5db'};">⭐</span>`
+                                    ).join('')}
+                                </div>
+                                <p style="font-size: 0.875rem; color: var(--text-muted);">${r.comment}</p>
+                            </div>
+                        `).join('') : '<p style="color: var(--text-muted); font-size: 0.875rem;">No reviews yet. Be the first to review!</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addToCart() {
+            auth.addToCart(product);
+            showToast('Added to cart!', 'success');
+            // Update cart badge
+            document.getElementById('portalHeader').innerHTML = renderPortalHeader('Customer Portal', true);
+        }
+
+        function orderNow() {
+            window.location.href = `checkout.html?id=${product.id}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth Integration</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .test-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #1e293b;
+        }
+        button {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .success {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Authentication Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Login</h2>
+        <button onclick="testLogin('customer@test.com', 'customer123')">Login as Customer</button>
+        <button onclick="testLogin('seller@test.com', 'seller123')">Login as Seller</button>
+        <button onclick="testLogin('admin@test.com', 'admin123')">Login as Admin</button>
+        <button onclick="testLogin('wrong@test.com', 'wrong')">Test Wrong Credentials</button>
+        <div id="loginResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Registration</h2>
+        <button onclick="testRegister()">Register New Customer</button>
+        <button onclick="testRegisterDuplicate()">Test Duplicate Email</button>
+        <div id="registerResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Current User Status</h2>
+        <button onclick="checkCurrentUser()">Check Current User</button>
+        <button onclick="testLogout()">Logout</button>
+        <div id="userResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        async function testLogin(email, password) {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Testing login...</p>';
+            
+            const result = await auth.login(email, password);
+            
+            if (result.success) {
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Login Successful!</p>
+                    <pre>${JSON.stringify(result.user, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Login Failed</p>
+                    <p>${result.message}</p>
+                `;
+            }
+        }
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Testing registration...</p>';
+            
+            const timestamp = Date.now();
+            const userData = {
+                name: `Test User ${timestamp}`,
+                email: `test${timestamp}@example.com`,
+                password: 'test123456',
+                role: 'customer'
+            };
+            
+            const result = await auth.register(userData);
+            
+            if (result.success) {
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Registration Successful!</p>
+                    <pre>${JSON.stringify(result.user, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Registration Failed</p>
+                    <p>${result.message}</p>
+                `;
+            }
+        }
+
+        async function testRegisterDuplicate() {
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Testing duplicate email...</p>';
+            
+            const userData = {
+                name: 'Duplicate User',
+                email: 'customer@test.com',
+                password: 'test123',
+                role: 'customer'
+            };
+            
+            const result = await auth.register(userData);
+            
+            if (result.success) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Should have failed (duplicate email)</p>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Correctly rejected duplicate email</p>
+                    <p>${result.message}</p>
+                `;
+            }
+        }
+
+        function checkCurrentUser() {
+            const resultDiv = document.getElementById('userResult');
+            resultDiv.style.display = 'block';
+            
+            const user = auth.getUser();
+            
+            if (user) {
+                resultDiv.innerHTML = `
+                    <p class="success">✅ User is logged in</p>
+                    <pre>${JSON.stringify(user, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p>ℹ️ No user currently logged in</p>
+                `;
+            }
+        }
+
+        function testLogout() {
+            const resultDiv = document.getElementById('userResult');
+            resultDiv.style.display = 'block';
+            
+            localStorage.removeItem('currentUser');
+            auth.currentUser = null;
+            
+            resultDiv.innerHTML = `
+                <p class="success">✅ Logged out successfully</p>
+            `;
+        }
+
+        // Check initial status
+        window.addEventListener('load', () => {
+            checkCurrentUser();
+        });
+    </script>
+</body>
+</html>
