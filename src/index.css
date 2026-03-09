@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 35% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 35% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 35% 15%;
+
+    --primary: 215 60% 22%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 30% 95%;
+    --secondary-foreground: 215 60% 22%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 15% 48%;
+
+    --accent: 25 95% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --ring: 25 95% 55%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 215 60% 18%;
+    --sidebar-foreground: 210 30% 90%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 50% 28%;
+    --sidebar-accent-foreground: 210 30% 95%;
+    --sidebar-border: 215 40% 30%;
+    --sidebar-ring: 25 95% 55%;
+
+    --navy: 215 60% 22%;
+    --navy-light: 215 50% 32%;
+    --navy-dark: 215 65% 14%;
+    --orange: 25 95% 55%;
+    --orange-light: 25 90% 65%;
+    --orange-dark: 25 95% 45%;
+
+    font-family: 'Inter', sans-serif;
+  }
+
+  .dark {
+    --background: 215 60% 8%;
+    --foreground: 210 30% 95%;
+    --card: 215 55% 12%;
+    --card-foreground: 210 30% 95%;
+    --popover: 215 55% 12%;
+    --popover-foreground: 210 30% 95%;
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 45% 18%;
+    --secondary-foreground: 210 30% 95%;
+    --muted: 215 40% 16%;
+    --muted-foreground: 215 15% 60%;
+    --accent: 25 95% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 35% 22%;
+    --input: 215 35% 22%;
+    --ring: 25 95% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent text-accent-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:shadow-accent/25 active:scale-[0.97];
+  }
+  .btn-outline {
+    @apply border-2 border-accent text-accent font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:bg-accent hover:text-accent-foreground;
+  }
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  .nav-link {
+    @apply relative text-sm font-medium transition-colors duration-200;
+  }
+  .nav-link.active {
+    @apply text-accent;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-accent scale-x-0 transition-transform duration-300 origin-left;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply scale-x-100;
+  }
+  .stat-card {
+    @apply bg-card rounded-xl p-6 shadow-sm border card-hover;
+  }
+  .badge-pending {
+    @apply bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full;
+  }
+  .badge-shipped {
+    @apply bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full;
+  }
+  .badge-delivered {
+    @apply bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-200;
+  }
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground/80 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+  }
+  .sidebar-link.active {
+    @apply bg-sidebar-accent text-sidebar-primary;
+  }
+}

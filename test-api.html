@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .test-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-card h3::before {
+            content: '🔌';
+            font-size: 1.5rem;
+        }
+
+        .endpoint {
+            background: #f7fafc;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #667eea;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .method-get { background: #48bb78; color: white; }
+        .method-post { background: #4299e1; color: white; }
+        .method-put { background: #ed8936; color: white; }
+        .method-delete { background: #f56565; color: white; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #2d3748;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .results h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .result-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .result-success {
+            background: #c6f6d5;
+            border-left: 4px solid #48bb78;
+        }
+
+        .result-error {
+            background: #fed7d7;
+            border-left: 4px solid #f56565;
+        }
+
+        .result-pending {
+            background: #feebc8;
+            border-left: 4px solid #ed8936;
+        }
+
+        .result-icon {
+            font-size: 1.5rem;
+        }
+
+        .result-text {
+            flex: 1;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .clear-btn {
+            background: #718096;
+            margin-top: 0;
+        }
+
+        .clear-btn:hover {
+            background: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 API Endpoint Tester</h1>
+            <p class="subtitle">Test all endpoints of the Fabrice E-Commerce API</p>
+            <p class="subtitle" style="margin-top: 0.5rem; font-weight: 600;">API Base: <span id="apiUrl">http://localhost:3001/api</span></p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" style="color: #667eea;" id="totalTests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #48bb78;" id="passedTests">0</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #f56565;" id="failedTests">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>Health Check</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/health</span>
+                </div>
+                <button onclick="testHealthCheck()">Test Health</button>
+            </div>
+
+            <div class="test-card">
+                <h3>Authentication</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/auth/register</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/auth/login</span>
+                </div>
+                <button onclick="testAuthentication()">Test Auth</button>
+            </div>
+
+            <div class="test-card">
+                <h3>Products</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/products</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/products</span>
+                </div>
+                <button onclick="testProducts()">Test Products</button>
+            </div>
+
+            <div class="test-card">
+                <h3>Orders</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/orders?user_id=X</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/orders</span>
+                </div>
+                <button onclick="testOrders()">Test Orders</button>
+            </div>
+
+            <div class="test-card">
+                <h3>Reviews</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/reviews?user_id=X</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/reviews</span>
+                </div>
+                <button onclick="testReviews()">Test Reviews</button>
+            </div>
+
+            <div class="test-card">
+                <h3>Users</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/users/:id</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-put">PUT</span>
+                    <span class="endpoint-path">/users/:id</span>
+                </div>
+                <button onclick="testUsers()">Test Users</button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+            <button onclick="runAllTests()" style="flex: 1;">🚀 Run All Tests</button>
+            <button onclick="clearResults()" class="clear-btn" style="flex: 0 0 150px;">Clear Results</button>
+        </div>
+
+        <div class="results">
+            <h2>Test Results</h2>
+            <div id="results">
+                <p style="color: #999; text-align: center; padding: 2rem;">No tests run yet. Click a test button to start.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3001/api';
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+        let testData = { users: {}, products: [], orders: [] };
+
+        function updateStats() {
+            document.getElementById('totalTests').textContent = totalTests;
+            document.getElementById('passedTests').textContent = passedTests;
+            document.getElementById('failedTests').textContent = failedTests;
+        }
+
+        function addResult(success, title, details = '') {
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv.querySelector('p')) {
+                resultsDiv.innerHTML = '';
+            }
+
+            totalTests++;
+            if (success) passedTests++;
+            else failedTests++;
+            updateStats();
+
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${success ? 'result-success' : 'result-error'}`;
+            resultItem.innerHTML = `
+                <div class="result-icon">${success ? '✓' : '✗'}</div>
+                <div class="result-text">
+                    <div class="result-title">${title}</div>
+                    ${details ? `<div class="result-details">${details}</div>` : ''}
+                </div>
+            `;
+            resultsDiv.appendChild(resultItem);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                const data = await response.json();
+                return { status: response.status, data };
+            } catch (error) {
+                return { status: 0, error: error.message };
+            }
+        }
+
+        async function testHealthCheck() {
+            const result = await makeRequest('/health');
+            addResult(
+                result.status === 200 && result.data.success,
+                'Health Check',
+                `Status: ${result.status}, Message: ${result.data.message || 'N/A'}`
+            );
+        }
+
+        async function testAuthentication() {
+            // Test login
+            const loginResult = await makeRequest('/auth/login', 'POST', {
+                email: 'customer@test.com',
+                password: 'customer123'
+            });
+            addResult(
+                loginResult.status === 200 && loginResult.data.success,
+                'Login Test',
+                `User: ${loginResult.data.user?.name || 'N/A'}, Role: ${loginResult.data.user?.role || 'N/A'}`
+            );
+
+            if (loginResult.data.user) {
+                testData.users.customer = loginResult.data.user;
+            }
+
+            // Test wrong password
+            const wrongPassResult = await makeRequest('/auth/login', 'POST', {
+                email: 'customer@test.com',
+                password: 'wrongpassword'
+            });
+            addResult(
+                wrongPassResult.status === 401 && !wrongPassResult.data.success,
+                'Wrong Password Rejection',
+                `Message: ${wrongPassResult.data.message || 'N/A'}`
+            );
+        }
+
+        async function testProducts() {
+            // Get all products
+            const allProducts = await makeRequest('/products');
+            addResult(
+                allProducts.status === 200 && allProducts.data.success,
+                'Get All Products',
+                `Found ${allProducts.data.data?.length || 0} products`
+            );
+
+            if (allProducts.data.data && allProducts.data.data.length > 0) {
+                testData.products = allProducts.data.data;
+                
+                // Get single product
+                const singleProduct = await makeRequest(`/products/${testData.products[0].id}`);
+                addResult(
+                    singleProduct.status === 200 && singleProduct.data.success,
+                    'Get Single Product',
+                    `Product: ${singleProduct.data.data?.name || 'N/A'}`
+                );
+            }
+        }
+
+        async function testOrders() {
+            const userId = testData.users.customer?.id || 1;
+
+            // Get user orders
+            const orders = await makeRequest(`/orders?user_id=${userId}`);
+            addResult(
+                orders.status === 200 && orders.data.success,
+                'Get User Orders',
+                `Found ${orders.data.data?.length || 0} orders`
+            );
+
+            // Create order
+            if (testData.products.length > 0) {
+                const newOrder = {
+                    user_id: userId,
+                    items: [{
+                        product_id: testData.products[0].id,
+                        product_name: testData.products[0].name,
+                        product_price: parseFloat(testData.products[0].price),
+                        quantity: 1,
+                        subtotal: parseFloat(testData.products[0].price)
+                    }],
+                    total_amount: parseFloat(testData.products[0].price) + 5.00,
+                    status: 'Pending',
+                    shipping_address: '123 Test St',
+                    shipping_name: 'Test User',
+                    shipping_phone: '+250788123456',
+                    payment_method: 'cash'
+                };
+
+                const createOrder = await makeRequest('/orders', 'POST', newOrder);
+                addResult(
+                    createOrder.status === 201 && createOrder.data.success,
+                    'Create Order',
+                    `Order ID: ${createOrder.data.order_id || 'N/A'}`
+                );
+            }
+        }
+
+        async function testReviews() {
+            const userId = testData.users.customer?.id || 1;
+
+            // Get user reviews
+            const reviews = await makeRequest(`/reviews?user_id=${userId}`);
+            addResult(
+                reviews.status === 200 && reviews.data.success,
+                'Get User Reviews',
+                `Found ${reviews.data.data?.length || 0} reviews`
+            );
+        }
+
+        async function testUsers() {
+            const userId = testData.users.customer?.id || 1;
+
+            // Get user
+            const user = await makeRequest(`/users/${userId}`);
+            addResult(
+                user.status === 200 && user.data.success,
+                'Get User Profile',
+                `User: ${user.data.data?.name || 'N/A'}, Email: ${user.data.data?.email || 'N/A'}`
+            );
+        }
+
+        async function runAllTests() {
+            clearResults();
+            await testHealthCheck();
+            await testAuthentication();
+            await testProducts();
+            await testOrders();
+            await testReviews();
+            await testUsers();
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">No tests run yet. Click a test button to start.</p>';
+            totalTests = 0;
+            passedTests = 0;
+            failedTests = 0;
+            updateStats();
+        }
+    </script>
+</body>
+</html>

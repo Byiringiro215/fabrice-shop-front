@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Seller Panel</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div id="portalHeader"></div>
+    
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2 style="padding: 1.5rem; font-size: 1.25rem; font-weight: 700; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">Seller Panel</h2>
+            <nav>
+                <a href="seller-dashboard.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="seller-products.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    <span>My Products</span>
+                </a>
+                <a href="seller-add-product.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Add Product</span>
+                </a>
+                <a href="seller-profile.html" class="sidebar-link active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Profile</span>
+                </a>
+                <a href="seller-settings.html" class="sidebar-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                        <path d="M17 7l-5 5"></path>
+                        <path d="M7 7l5 5"></path>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding: 0.75rem;">
+                <button onclick="auth.logout()" class="btn btn-outline btn-full" style="color: #ef4444; border-color: #ef4444;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+            <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 2rem;">Seller Profile</h1>
+
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 2rem;">
+                <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+                    <div id="profileAvatar" style="width: 96px; height: 96px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700;"></div>
+                    <div>
+                        <h2 id="profileName" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;"></h2>
+                        <p id="profileEmail" style="color: var(--text-muted);"></p>
+                        <p style="font-size: 0.875rem; color: var(--text-muted); text-transform: capitalize;" id="profileRole"></p>
+                    </div>
+                </div>
+
+                <form id="profileForm" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label class="form-label">Business Name</label>
+                        <input type="text" class="form-input" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Address</label>
+                        <textarea class="form-textarea" id="address" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Description</label>
+                        <textarea class="form-textarea" id="description" rows="4" placeholder="Tell customers about your business..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/portal-header.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        auth.requireRole('seller');
+        const user = auth.getUser();
+
+        // Initialize portal header
+        document.getElementById('portalHeader').innerHTML = renderPortalHeader('Seller Panel', false);
+
+        // Populate profile
+        document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+        document.getElementById('profileName').textContent = user.name;
+        document.getElementById('profileEmail').textContent = user.email;
+        document.getElementById('profileRole').textContent = user.role;
+        document.getElementById('name').value = user.name;
+        document.getElementById('email').value = user.email;
+
+        document.getElementById('profileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast('Profile updated successfully!', 'success');
+        });
+    </script>
+</body>
+</html>
